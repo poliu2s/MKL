@@ -1,4 +1,6 @@
 MKL
 ===
 
-Adventures in Intel's Math Kernel Library. I am currently using it to speed up some matrix operations at work so I am playing around with the API.
+I am currently using Intel's Math Kernel Library in C++ to speed up matrix calcuations.
+
+I present some of my implementations and musings here.
