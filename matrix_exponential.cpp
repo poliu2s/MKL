@@ -4,7 +4,7 @@
 
 // Matrix exponential function calculation
 // Implementation by Po Liu using Intel's Math Kernel Library in C++
-// Algorithm based on paper published by Arsigny (in same folder)
+// Algorithm based Arsigny's PhD thesis (PDF of specific page in same folder)
 
 using namespace std;
 
