@@ -3,7 +3,7 @@
 #include <math.h>
 
 // Matrix exponential function calculation
-// Implementation by Po Liu using Intel's Math Kernel Library in C++
+// Implementation by Po Liu using Intel's Math Kernel Library 11.0.4 in C++
 // Algorithm based Arsigny's PhD thesis (PDF of specific page in same folder)
 
 using namespace std;
