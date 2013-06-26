@@ -15,6 +15,8 @@ double factorial(int n)
 
 double* matrix_exponential(double* matrix)
 {
+	mkl_disable_fast_mm();
+	
 	int accuracy = 10;
 	int one = 1;
 	int zero = 0;
@@ -24,6 +26,7 @@ double* matrix_exponential(double* matrix)
 	// Scaling
 	int N = 4;
 
+	
 	//M_small = M/(2^N);
 	double* M_small = (double*)mkl_malloc(4 * 4 * sizeof(double), 64);
 	for(int i = 0; i < 16; i++) M_small[i] = matrix[i] / pow(2.0, (double)N);
@@ -36,30 +39,43 @@ double* matrix_exponential(double* matrix)
 
 	double* M_power = (double*)mkl_malloc(4 * 4 * sizeof(double), 64);
 	double* M_power1 = (double*)mkl_malloc(4 * 4 * sizeof(double), 64);
-	for(int i = 0; i < 16; i++) M_power[i] = M_small[i];
+	dcopy(&sxtn, M_small, &one, M_power, &one);
 
 	double* tmpM1 = (double*)mkl_malloc(4 * 4 * sizeof(double), 64);
 
+	double factorial_i = 1.0;
 	for(int i = 1; i < accuracy; i++) {
+		factorial_i = factorial_i * i;
 
 		//m_exp = m_exp + M_power/factorial(i);
-		for(int x = 0; x < 16; x++) tmpM1[x] = M_power[x] / factorial(i);
+		for(int x = 0; x < 16; x++) tmpM1[x] = M_power[x] / factorial_i;
+		
 		vdAdd(sxtn, m_exp, tmpM1, m_exp);
 
 		//M_power = M_power * M_small;
 		cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
 					4, 4, 4, 1.0, M_power, 4, M_small, 4, 0.0, M_power1, 4);
-		for(int x = 0; x < 16; x++) M_power[x] = M_power1[x];
+		dcopy(&sxtn, M_power1, &one, M_power, &one);
 
 	}
-
+	
 	// Squaring step
 	for(int i = 0; i < N; i++) {
 		// m_exp = m_exp*m_exp;
 		cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
 					4, 4, 4, 1.0, m_exp, 4, m_exp, 4, 0.0, m_exp1, 4);
-		for(int x = 0; x < 16; x++) m_exp[x] = m_exp1[x];
+		dcopy(&sxtn, m_exp1, &one, m_exp, &one);
 	}
+
+	mkl_free_buffers();
+	mkl_thread_free_buffers();
+	
+	mkl_free(M_small);
+	mkl_free(m_exp1);
+	mkl_free(M_power);
+	mkl_free(M_power1);
+	mkl_free(tmpM1);
+	
 	return m_exp;
 }
 
