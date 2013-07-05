@@ -94,7 +94,7 @@ int main()
 	A[14] = 0.0;
 	A[15] = 0.0;
 
-	B = matrix_exponential(A);
+	matrix_exponential(A, B);
 
 	for(int i = 0; i < 4; i++) {
 		for(int j = 0; j < 4; j++)
