@@ -8,38 +8,26 @@
 
 using namespace std;
 
-double factorial(int n)
+double* matrix_exponential(double* matrix, double* result)
 {
-  return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
-}
-
-double* matrix_exponential(double* matrix)
-{
-	mkl_disable_fast_mm();
-	
 	int accuracy = 10;
-	int one = 1;
-	int zero = 0;
-	int sxtn = 16;
-	int four = 4;
 
 	// Scaling
 	int N = 4;
 
-	
 	//M_small = M/(2^N);
 	double* M_small = (double*)mkl_malloc(4 * 4 * sizeof(double), 64);
 	for(int i = 0; i < 16; i++) M_small[i] = matrix[i] / pow(2.0, (double)N);
 
 	// Exp part
-	double* m_exp = (double*)mkl_malloc(4 * 4 * sizeof(double), 64);
 	double* m_exp1 = (double*)mkl_malloc(4 * 4 * sizeof(double), 64);
-	for(int i = 0; i < 16; i++) m_exp[i] = 0.0;
-	for(int i = 0; i < 16; i+=5) m_exp[i] = 1.0;
+	double* m_exp2 = (double*)mkl_malloc(4 * 4 * sizeof(double), 64);
+	for(int i = 0; i < 16; i++) result[i] = 0.0;
+	for(int i = 0; i < 16; i+=5) result[i] = 1.0;
 
 	double* M_power = (double*)mkl_malloc(4 * 4 * sizeof(double), 64);
 	double* M_power1 = (double*)mkl_malloc(4 * 4 * sizeof(double), 64);
-	dcopy(&sxtn, M_small, &one, M_power, &one);
+	cblas_dcopy(16, M_small, 1, M_power, 1);
 
 	double* tmpM1 = (double*)mkl_malloc(4 * 4 * sizeof(double), 64);
 
@@ -50,33 +38,34 @@ double* matrix_exponential(double* matrix)
 		//m_exp = m_exp + M_power/factorial(i);
 		for(int x = 0; x < 16; x++) tmpM1[x] = M_power[x] / factorial_i;
 		
-		vdAdd(sxtn, m_exp, tmpM1, m_exp);
+		vdAdd(sxtn, result, tmpM1, result);
 
 		//M_power = M_power * M_small;
+		cblas_dcopy(16, M_power, 1, M_power1, 1);
 		cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
-					4, 4, 4, 1.0, M_power, 4, M_small, 4, 0.0, M_power1, 4);
-		dcopy(&sxtn, M_power1, &one, M_power, &one);
-
+					4, 4, 4, 1.0, M_power1, 4, M_small, 4, 0.0, M_power, 4);
 	}
+
 	
 	// Squaring step
+	const MKL_INT oneb = 1;
 	for(int i = 0; i < N; i++) {
 		// m_exp = m_exp*m_exp;
+		cblas_dcopy(16, result, oneb, m_exp1, 1);
+		cblas_dcopy(16, result, 1, m_exp2, 1);
 		cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
-					4, 4, 4, 1.0, m_exp, 4, m_exp, 4, 0.0, m_exp1, 4);
-		dcopy(&sxtn, m_exp1, &one, m_exp, &one);
+					4, 4, 4, 1.0, m_exp1, 4, m_exp2, 4, 0.0, result, 4);
 	}
-
-	mkl_free_buffers();
-	mkl_thread_free_buffers();
 	
+
 	mkl_free(M_small);
 	mkl_free(m_exp1);
-	mkl_free(M_power);
-	mkl_free(M_power1);
+	//mkl_free(M_power);
+	//mkl_free(M_power1);
 	mkl_free(tmpM1);
+	mkl_free(m_exp2);
 	
-	return m_exp;
+	return;
 }
 
 
