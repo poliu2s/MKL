@@ -38,7 +38,7 @@ double* matrix_exponential(double* matrix, double* result)
 		//m_exp = m_exp + M_power/factorial(i);
 		for(int x = 0; x < 16; x++) tmpM1[x] = M_power[x] / factorial_i;
 		
-		vdAdd(sxtn, result, tmpM1, result);
+		vdAdd(16, result, tmpM1, result);
 
 		//M_power = M_power * M_small;
 		cblas_dcopy(16, M_power, 1, M_power1, 1);
