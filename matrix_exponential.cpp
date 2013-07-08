@@ -8,7 +8,7 @@
 
 using namespace std;
 
-double* matrix_exponential(double* matrix, double* result)
+void matrix_exponential(double* matrix, double* result)
 {
 	int accuracy = 10;
 
