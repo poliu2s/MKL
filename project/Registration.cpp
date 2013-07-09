@@ -1,13 +1,6 @@
-//Author: Changhoon Baek(45322096)
-//Edited by: Po Liu (13623079)
-
 #include "Registration.h"
 #include <mkl.h>
 #include <ctime>
-
-// VNL exp
-//#include <vnl/vnl_matrix_exp.h>
-//#include <vnl/vnl_matrix.h>
 
 
 
