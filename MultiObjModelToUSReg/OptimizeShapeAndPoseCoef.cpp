@@ -434,7 +434,8 @@ void Registration::optimizeShapeAndPoseCoefMKL_lbfgs(double* x_min,
 				gamma_local[i] = 0.0;
 			}
 
-		
+			//cout << "fails" << endl;
+			//getchar();
 
 			//printMatrix(poseCoef, 1, poseCoefLength, "poseCoef");
 			//printMatrix(shapeCoef, 1, shapeCoefLength, "shapeCoef");
@@ -632,6 +633,7 @@ void Registration::computeMultiTransformationValueAndDerivative(double* theta, d
 		getchar();
 		*/
 
+		// fails here
 		MultiObjModelMKL::matrix_exponential(transform_tmp, transform_tmp2);		
 		cblas_dcopy(16, transform_tmp2, 1, &Tr[i*16], 1);
 		
