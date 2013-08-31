@@ -1,6 +1,5 @@
 MKL
 ===
 
-I am currently using Intel's Math Kernel Library in C++ to speed up matrix calcuations.
+This is a repo containing programs I have written using Intel's Math Kernel Library in C++ to speed up matrix calcuations for the purpose of medical image processing.
 
-I present some of my implementations and musings here.
